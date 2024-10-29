@@ -24,15 +24,13 @@ import { Ride } from "@/types/type";
 const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
-
   const { setUserLocation, setDestinationLocation } = useLocationStore();
 
-  const handleSignOut = () => {
-    signOut();
-    router.replace("/(auth)/sign-in");
-  };
-
   const [hasPermission, setHasPermission] = useState<boolean>(false);
+  const [currentLocation, setCurrentLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
 
   const {
     data: recentRides,
@@ -40,103 +38,126 @@ const Home = () => {
     error,
   } = useFetch<Ride[]>(`/(api)/ride/${user?.id}`);
 
+  // Handle sign out
+  const handleSignOut = () => {
+    signOut();
+    router.replace("/(auth)/sign-in");
+  };
+
+  // Request location and update store
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setHasPermission(false);
-        return;
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setHasPermission(false);
+          console.warn("Location permissions not granted");
+          return;
+        }
+        setHasPermission(true);
+
+        const location = await Location.getCurrentPositionAsync({});
+        setCurrentLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+
+        const address = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+
+        setUserLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          address: `${address[0]?.name || "Unknown"}, ${address[0]?.region || "Unknown"}`,
+        });
+      } catch (error) {
+        console.error("Error fetching location:", error);
       }
-
-      let location = await Location.getCurrentPositionAsync({});
-
-      const address = await Location.reverseGeocodeAsync({
-        latitude: location.coords?.latitude!,
-        longitude: location.coords?.longitude!,
-      });
-
-      setUserLocation({
-        latitude: location.coords?.latitude,
-        longitude: location.coords?.longitude,
-        address: `${address[0].name}, ${address[0].region}`,
-      });
     })();
   }, []);
 
+  // Handle destination selection
   const handleDestinationPress = (location: {
     latitude: number;
     longitude: number;
     address: string;
   }) => {
     setDestinationLocation(location);
-
     router.push("/(root)/find-ride");
   };
 
   return (
-    <SafeAreaView className="bg-general-500">
-      <FlatList
-        data={recentRides?.slice(0, 5)}
-        renderItem={({ item }) => <RideCard ride={item} />}
-        keyExtractor={(item, index) => index.toString()}
-        className="px-5"
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{
-          paddingBottom: 100,
-        }}
-        ListEmptyComponent={() => (
-          <View className="flex flex-col items-center justify-center">
-            {!loading ? (
-              <>
-                <Image
-                  source={images.noResult}
-                  className="w-40 h-40"
-                  alt="No recent rides found"
-                  resizeMode="contain"
-                />
-                <Text className="text-sm">No recent rides found</Text>
-              </>
-            ) : (
-              <ActivityIndicator size="small" color="#000" />
+      <SafeAreaView className="bg-general-500">
+        <FlatList
+            data={recentRides?.slice(0, 5)}
+            renderItem={({ item }) => <RideCard ride={item} />}
+            keyExtractor={(item, index) => index.toString()}
+            className="px-5"
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{
+              paddingBottom: 100,
+            }}
+            ListEmptyComponent={() => (
+                <View className="flex flex-col items-center justify-center">
+                  {!loading ? (
+                      <>
+                        <Image
+                            source={images.noResult}
+                            className="w-40 h-40"
+                            alt="No recent rides found"
+                            resizeMode="contain"
+                        />
+                        <Text className="text-sm">No recent rides found</Text>
+                      </>
+                  ) : (
+                      <ActivityIndicator size="small" color="#000" />
+                  )}
+                </View>
             )}
-          </View>
-        )}
-        ListHeaderComponent={
-          <>
-            <View className="flex flex-row items-center justify-between my-5">
-              <Text className="text-2xl font-JakartaExtraBold">
-                Welcome {user?.firstName}👋
-              </Text>
-              <TouchableOpacity
-                onPress={handleSignOut}
-                className="justify-center items-center w-10 h-10 rounded-full bg-white"
-              >
-                <Image source={icons.out} className="w-4 h-4" />
-              </TouchableOpacity>
-            </View>
+            ListHeaderComponent={
+              <>
+                <View className="flex flex-row items-center justify-between my-5">
+                  <Text className="text-2xl font-JakartaExtraBold">
+                    Welcome {user?.firstName} 👋
+                  </Text>
+                  <TouchableOpacity
+                      onPress={handleSignOut}
+                      className="justify-center items-center w-10 h-10 rounded-full bg-white"
+                  >
+                    <Image source={icons.out} className="w-4 h-4" />
+                  </TouchableOpacity>
+                </View>
 
-            <GoogleTextInput
-              icon={icons.search}
-              containerStyle="bg-white shadow-md shadow-neutral-300"
-              handlePress={handleDestinationPress}
-            />
+                <GoogleTextInput
+                    icon={icons.search}
+                    containerStyle="bg-white shadow-md shadow-neutral-300"
+                    handlePress={handleDestinationPress}
+                />
 
-            <>
-              <Text className="text-xl font-JakartaBold mt-5 mb-3">
-                Your current location
-              </Text>
-              <View className="flex flex-row items-center bg-transparent h-[300px]">
-                <Map />
-              </View>
-            </>
+                <>
+                  <Text className="text-xl font-JakartaBold mt-5 mb-3">
+                    Your current location
+                  </Text>
+                  <View className="flex flex-row items-center bg-transparent h-[300px]">
+                    {hasPermission && currentLocation ? (
+                        <Map location={currentLocation} />
+                    ) : (
+                        <Text className="text-sm text-center">
+                          Unable to access location. Please enable location services.
+                        </Text>
+                    )}
+                  </View>
+                </>
 
-            <Text className="text-xl font-JakartaBold mt-5 mb-3">
-              Recent Rides
-            </Text>
-          </>
-        }
-      />
-    </SafeAreaView>
+                <Text className="text-xl font-JakartaBold mt-5 mb-3">
+                  Recent Rides
+                </Text>
+              </>
+            }
+        />
+      </SafeAreaView>
   );
 };
 

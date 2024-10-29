@@ -7,19 +7,25 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#2F80ED"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundler": "metro",
+      "output": "server",
+      "favicon": "./assets/images/favicon.png",
+      "bundleIdentifier": "com.eregain.wedriveapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.eregain.wedriveapp"
     },
     "web": {
       "bundler": "metro",
@@ -35,7 +41,16 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": false
+    },
+    "extra": {
+      "eas": {
+        "newArchitecture": true,
+        "projectId": "d8f94daf-b67f-45dd-9b84-b26a1a1f0aa0"
+      },
+      "router": {
+        "origin": "https://uber.dev/"
+      }
     }
   }
 }

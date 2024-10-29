@@ -43,9 +43,9 @@ const Map = () => {
 
   useEffect(() => {
     if (
-      markers.length > 0 &&
-      destinationLatitude !== undefined &&
-      destinationLongitude !== undefined
+        markers.length > 0 &&
+        destinationLatitude !== undefined &&
+        destinationLongitude !== undefined
     ) {
       calculateDriverTimes({
         markers,
@@ -68,70 +68,70 @@ const Map = () => {
 
   if (loading || (!userLatitude && !userLongitude))
     return (
-      <View className="flex justify-between items-center w-full">
-        <ActivityIndicator size="small" color="#000" />
-      </View>
+        <View className="flex justify-between items-center w-full">
+          <ActivityIndicator size="small" color="#000" />
+        </View>
     );
 
   if (error)
     return (
-      <View className="flex justify-between items-center w-full">
-        <Text>Error: {error}</Text>
-      </View>
+        <View className="flex justify-between items-center w-full">
+          <Text>Error: {error}</Text>
+        </View>
     );
 
   return (
-    <MapView
-      provider={PROVIDER_DEFAULT}
-      className="w-full h-full rounded-2xl"
-      tintColor="black"
-      mapType="mutedStandard"
-      showsPointsOfInterest={false}
-      initialRegion={region}
-      showsUserLocation={true}
-      userInterfaceStyle="light"
-    >
-      {markers.map((marker, index) => (
-        <Marker
-          key={marker.id}
-          coordinate={{
-            latitude: marker.latitude,
-            longitude: marker.longitude,
-          }}
-          title={marker.title}
-          image={
-            selectedDriver === +marker.id ? icons.selectedMarker : icons.marker
-          }
-        />
-      ))}
+      <MapView
+          provider={PROVIDER_DEFAULT}
+          className="w-full h-full rounded-2xl"
+          tintColor="black"
+          mapType="mutedStandard"
+          showsPointsOfInterest={false}
+          initialRegion={region}
+          showsUserLocation={true}
+          userInterfaceStyle="light"
+      >
+        {markers.map((marker, index) => (
+            <Marker
+                key={marker.id}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+                title={marker.title}
+                image={
+                  selectedDriver === +marker.id ? icons.selectedMarker : icons.marker
+                }
+            />
+        ))}
 
-      {destinationLatitude && destinationLongitude && (
-        <>
-          <Marker
-            key="destination"
-            coordinate={{
-              latitude: destinationLatitude,
-              longitude: destinationLongitude,
-            }}
-            title="Destination"
-            image={icons.pin}
-          />
-          <MapViewDirections
-            origin={{
-              latitude: userLatitude!,
-              longitude: userLongitude!,
-            }}
-            destination={{
-              latitude: destinationLatitude,
-              longitude: destinationLongitude,
-            }}
-            apikey={directionsAPI!}
-            strokeColor="#0286FF"
-            strokeWidth={2}
-          />
-        </>
-      )}
-    </MapView>
+        {destinationLatitude && destinationLongitude && (
+            <>
+              <Marker
+                  key="destination"
+                  coordinate={{
+                    latitude: destinationLatitude,
+                    longitude: destinationLongitude,
+                  }}
+                  title="Destination"
+                  image={icons.pin}
+              />
+              <MapViewDirections
+                  origin={{
+                    latitude: userLatitude!,
+                    longitude: userLongitude!,
+                  }}
+                  destination={{
+                    latitude: destinationLatitude,
+                    longitude: destinationLongitude,
+                  }}
+                  apikey={directionsAPI!}
+                  strokeColor="#0286FF"
+                  strokeWidth={2}
+              />
+            </>
+        )}
+      </MapView>
   );
 };
 

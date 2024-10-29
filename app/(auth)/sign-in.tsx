@@ -37,7 +37,7 @@ const SignIn = () => {
       console.log(JSON.stringify(err, null, 2));
       Alert.alert("Error", err.errors[0].longMessage);
     }
-  }, [isLoaded, form]);
+  }, [isLoaded, signIn, form.email, form.password, setActive]);
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -45,7 +45,7 @@ const SignIn = () => {
         <View className="relative w-full h-[250px]">
           <Image source={images.signUpCar} className="z-0 w-full h-[250px]" />
           <Text className="text-2xl text-black font-JakartaSemiBold absolute bottom-5 left-5">
-            Welcome 👋
+            Welcome 👋 To SwiftRide
           </Text>
         </View>
 

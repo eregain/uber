@@ -1,7 +1,7 @@
-import { TextInputProps, TouchableOpacityProps } from "react-native";
+import {TextInputProps, TouchableOpacityProps} from "react-native";
 
 declare interface Driver {
-  id: number;
+  driver_id: number;
   first_name: string;
   last_name: string;
   profile_image_url: string;
@@ -44,7 +44,7 @@ declare interface Ride {
   fare_price: number;
   payment_status: string;
   driver_id: number;
-  user_id: string;
+  user_email: string;
   created_at: string;
   driver: {
     first_name: string;
@@ -68,10 +68,10 @@ declare interface GoogleInputProps {
   containerStyle?: string;
   textInputBackgroundColor?: string;
   handlePress: ({
-    latitude,
-    longitude,
-    address,
-  }: {
+                  latitude,
+                  longitude,
+                  address,
+                }: {
     latitude: number;
     longitude: number;
     address: string;
@@ -105,19 +105,19 @@ declare interface LocationStore {
   destinationLongitude: number | null;
   destinationAddress: string | null;
   setUserLocation: ({
-    latitude,
-    longitude,
-    address,
-  }: {
+                      latitude,
+                      longitude,
+                      address,
+                    }: {
     latitude: number;
     longitude: number;
     address: string;
   }) => void;
   setDestinationLocation: ({
-    latitude,
-    longitude,
-    address,
-  }: {
+                             latitude,
+                             longitude,
+                             address,
+                           }: {
     latitude: number;
     longitude: number;
     address: string;
