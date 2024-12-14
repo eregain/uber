@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       destination_latitude,
       destination_longitude,
       ride_time,
-      fare_price,
+      bid_price,
       payment_status,
       driver_id,
       user_id,
@@ -25,14 +25,14 @@ export async function POST(request: Request) {
       !destination_latitude ||
       !destination_longitude ||
       !ride_time ||
-      !fare_price ||
+      !bid_price ||
       !payment_status ||
       !driver_id ||
       !user_id
     ) {
       return Response.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
           ${destination_latitude},
           ${destination_longitude},
           ${ride_time},
-          ${fare_price},
+          ${bid_price},
           ${payment_status},
           ${driver_id},
           ${user_id}

@@ -1,82 +1,71 @@
-import { View, Image } from "react-native";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState } from "react";
+import { View, TextInput, TouchableOpacity, Image, Alert } from "react-native";
 
-import { icons } from "@/constants";
-import { GoogleInputProps } from "@/types/type";
+import { useLocationStore } from "../store";
 
-const googlePlacesApiKey = process.env.EXPO_PUBLIC_PLACES_API_KEY;
+interface GoogleTextInputProps {
+  icon: any;
+  containerStyle?: string;
+  handlePress: (location: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => void;
+}
 
-const GoogleTextInput = ({
+const GoogleTextInput: React.FC<GoogleTextInputProps> = ({
   icon,
-  initialLocation,
   containerStyle,
-  textInputBackgroundColor,
   handlePress,
-}: GoogleInputProps) => {
+}) => {
+  const [searchText, setSearchText] = useState("");
+
+  const handleSearch = async () => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}`,
+        {
+          headers: {
+            "User-Agent": "YourAppName/1.0",
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const location = {
+          latitude: parseFloat(data[0].lat),
+          longitude: parseFloat(data[0].lon),
+          address: data[0].display_name,
+        };
+        handlePress(location);
+      } else {
+        Alert.alert("No results found", "Please try a different search term.");
+      }
+    } catch (error) {
+      console.error("Error searching for location:", error);
+      Alert.alert(
+        "Error",
+        "Failed to search for location. Please check your internet connection and try again.",
+      );
+    }
+  };
+
   return (
-    <View
-      className={`flex flex-row items-center justify-center relative z-50 rounded-xl ${containerStyle}`}
-    >
-      <GooglePlacesAutocomplete
-        fetchDetails={true}
-        placeholder="Search"
-        debounce={200}
-        styles={{
-          textInputContainer: {
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 20,
-            marginHorizontal: 20,
-            position: "relative",
-            shadowColor: "#d4d4d4",
-          },
-          textInput: {
-            backgroundColor: textInputBackgroundColor
-              ? textInputBackgroundColor
-              : "white",
-            fontSize: 16,
-            fontWeight: "600",
-            marginTop: 5,
-            width: "100%",
-            borderRadius: 200,
-          },
-          listView: {
-            backgroundColor: textInputBackgroundColor
-              ? textInputBackgroundColor
-              : "white",
-            position: "relative",
-            top: 0,
-            width: "100%",
-            borderRadius: 10,
-            shadowColor: "#d4d4d4",
-            zIndex: 99,
-          },
-        }}
-        onPress={(data, details = null) => {
-          handlePress({
-            latitude: details?.geometry.location.lat!,
-            longitude: details?.geometry.location.lng!,
-            address: data.description,
-          });
-        }}
-        query={{
-          key: googlePlacesApiKey,
-          language: "en",
-        }}
-        renderLeftButton={() => (
-          <View className="justify-center items-center w-6 h-6">
-            <Image
-              source={icon ? icon : icons.search}
-              className="w-6 h-6"
-              resizeMode="contain"
-            />
-          </View>
-        )}
-        textInputProps={{
-          placeholderTextColor: "gray",
-          placeholder: initialLocation ?? "Where do you want to go?",
-        }}
+    <View className={`flex-row items-center ${containerStyle}`}>
+      <TextInput
+        placeholder="Where to?"
+        className="flex-1 h-12 px-4"
+        value={searchText}
+        onChangeText={setSearchText}
+        onSubmitEditing={handleSearch}
       />
+      <TouchableOpacity onPress={handleSearch} className="p-2">
+        <Image source={icon} className="w-6 h-6" />
+      </TouchableOpacity>
     </View>
   );
 };

@@ -7,31 +7,31 @@ import RideLayout from "@/components/RideLayout";
 import { useDriverStore } from "@/store";
 
 const ConfirmRide = () => {
-    const { drivers, selectedDriver, setSelectedDriver } = useDriverStore();
+  const { drivers, selectedDriver, setSelectedDriver } = useDriverStore();
 
-    return (
-        <RideLayout title={"Choose a Rider"} snapPoints={["65%", "85%"]}>
-            <FlatList
-                data={drivers}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item, index }) => (
-                    <DriverCard
-                        item={item}
-                        selected={selectedDriver!}
-                        setSelected={() => setSelectedDriver(item.id!)}
-                    />
-                )}
-                ListFooterComponent={() => (
-                    <View className="mx-5 mt-10">
-                        <CustomButton
-                            title="Select Ride"
-                            onPress={() => router.push("/(root)/book-ride")}
-                        />
-                    </View>
-                )}
+  return (
+    <RideLayout title={"Choose a Rider"} snapPoints={["35%", "85%"]}>
+      <FlatList
+        data={drivers}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <DriverCard
+            item={item}
+            selected={selectedDriver!}
+            setSelected={() => setSelectedDriver(item.id!)}
+          />
+        )}
+        ListFooterComponent={() => (
+          <View className="mx-5 mt-7">
+            <CustomButton
+              title="Select Ride"
+              onPress={() => router.push("/(root)/book-ride")}
             />
-        </RideLayout>
-    );
+          </View>
+        )}
+      />
+    </RideLayout>
+  );
 };
 
 export default ConfirmRide;

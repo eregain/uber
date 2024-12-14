@@ -1,9 +1,8 @@
 import { neon } from "@neondatabase/serverless";
 
 export async function GET(request: Request, { id }: { id: string }) {
-  if (!id) {
+  if (!id)
     return Response.json({ error: "Missing required fields" }, { status: 400 });
-  }
 
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
@@ -27,7 +26,8 @@ export async function GET(request: Request, { id }: { id: string }) {
                 'profile_image_url', drivers.profile_image_url,
                 'car_image_url', drivers.car_image_url,
                 'car_seats', drivers.car_seats,
-                'rating', drivers.rating
+                'rating', drivers.rating,
+                'bid_price', drivers.bid_price,
             ) AS driver 
         FROM 
             rides
@@ -37,7 +37,7 @@ export async function GET(request: Request, { id }: { id: string }) {
             rides.user_id = ${id}
         ORDER BY 
             rides.created_at DESC;
-        `;
+    `;
 
     return Response.json({ data: response });
   } catch (error) {

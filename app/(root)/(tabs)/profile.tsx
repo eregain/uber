@@ -32,7 +32,7 @@ const Profile = () => {
               placeholder={user?.firstName || "Not Found"}
               containerStyle="w-full"
               inputStyle="p-3.5"
-              editable={false}
+              editable={true}
             />
 
             <InputField
@@ -40,7 +40,7 @@ const Profile = () => {
               placeholder={user?.lastName || "Not Found"}
               containerStyle="w-full"
               inputStyle="p-3.5"
-              editable={false}
+              editable={true}
             />
 
             <InputField
@@ -50,7 +50,7 @@ const Profile = () => {
               }
               containerStyle="w-full"
               inputStyle="p-3.5"
-              editable={false}
+              editable={true}
             />
 
             <InputField
@@ -58,7 +58,7 @@ const Profile = () => {
               placeholder={user?.primaryPhoneNumber?.phoneNumber || "Not Found"}
               containerStyle="w-full"
               inputStyle="p-3.5"
-              editable={false}
+              editable={true}
             />
           </View>
         </View>

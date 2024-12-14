@@ -1,4 +1,4 @@
-import {TextInputProps, TouchableOpacityProps} from "react-native";
+import { TextInputProps, TouchableOpacityProps } from "react-native";
 
 declare interface Driver {
   driver_id: number;
@@ -8,15 +8,17 @@ declare interface Driver {
   car_image_url: string;
   car_seats: number;
   rating: number;
+  price: number;
 }
 
 declare interface MarkerData {
+  marker: string;
   latitude: number;
   longitude: number;
   id: number;
   title: string;
   profile_image_url: string;
-  car_image_url: string;
+  car_image_url: "../assets/icons/icon.png";
   car_seats: number;
   rating: number;
   first_name: string;
@@ -68,10 +70,10 @@ declare interface GoogleInputProps {
   containerStyle?: string;
   textInputBackgroundColor?: string;
   handlePress: ({
-                  latitude,
-                  longitude,
-                  address,
-                }: {
+    latitude,
+    longitude,
+    address,
+  }: {
     latitude: number;
     longitude: number;
     address: string;
@@ -105,19 +107,19 @@ declare interface LocationStore {
   destinationLongitude: number | null;
   destinationAddress: string | null;
   setUserLocation: ({
-                      latitude,
-                      longitude,
-                      address,
-                    }: {
+    latitude,
+    longitude,
+    address,
+  }: {
     latitude: number;
     longitude: number;
     address: string;
   }) => void;
   setDestinationLocation: ({
-                             latitude,
-                             longitude,
-                             address,
-                           }: {
+    latitude,
+    longitude,
+    address,
+  }: {
     latitude: number;
     longitude: number;
     address: string;
@@ -125,7 +127,7 @@ declare interface LocationStore {
 }
 
 declare interface DriverStore {
-  drivers: MarkerData[];
+  drivers: Marker;
   selectedDriver: number | null;
   setSelectedDriver: (driverId: number) => void;
   setDrivers: (drivers: MarkerData[]) => void;
@@ -133,7 +135,8 @@ declare interface DriverStore {
 }
 
 declare interface DriverCardProps {
+  icon: "../assets/icons/marker.png";
   item: MarkerData;
-  selected: number;
-  setSelected: () => void;
+  selected: number | null;
+  setSelected: (driverId: number | null) => void;
 }
