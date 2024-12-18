@@ -49,10 +49,15 @@
         "projectId": "d8f94daf-b67f-45dd-9b84-b26a1a1f0aa0",
         "clerkFrontendApi": "process.env.EXPO_PUBLIC_CLERK_FRONTEND_API"
       },
-
       "router": {
         "origin": "https://uber.dev/"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d8f94daf-b67f-45dd-9b84-b26a1a1f0aa0"
     }
   }
 }

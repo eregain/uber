@@ -2,11 +2,10 @@ import { useUser } from "@clerk/clerk-expo";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import RideCard from "../../../components/RideCard";
-import { images } from "../../../constants";
-import { mockDrivers } from "../../../constants/mockData";
-import { useFetch } from "../../../lib/fetch";
-import { Ride } from "../../../types/type";
+import RideCard from "@/components/RideCard";
+import { images } from "@/constants";
+import { useFetch } from "@/lib/fetch";
+import { Ride } from "@/types/type";
 
 const Rides = () => {
   const { user } = useUser();
@@ -15,7 +14,7 @@ const Rides = () => {
     data: recentRides,
     loading,
     error,
-  } = useFetch<Ride[]>(`/(api)/ride/${user?.id}/[id]+api.ts`);
+  } = useFetch<Ride[]>(`/(api)/ride/${user?.id}`);
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -50,23 +49,6 @@ const Rides = () => {
             <Text className="text-2xl font-JakartaBold my-5">All Rides</Text>
           </>
         }
-      />
-      <FlatList
-        data={mockDrivers}
-        renderItem={({ item }) => (
-          <View className="flex-row items-center p-3 border-b border-gray-200">
-            <Image
-              source={{ uri: item.profile_image_url }}
-              style={{ width: 50, height: 50, borderRadius: 25 }}
-            />
-            <View className="ml-3">
-              <Text className="font-bold">{`${item.first_name} ${item.last_name}`}</Text>
-              <Text>{`Rating: ${item.rating}, Seats: ${item.car_seats}, Bid Price: ${item.bid_price}`}</Text>
-            </View>
-          </View>
-        )}
-        keyExtractor={(item) => item.id}
-        className="px-5"
       />
     </SafeAreaView>
   );

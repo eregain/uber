@@ -100,7 +100,7 @@ const Payment = ({
                   destination_latitude: destinationLatitude,
                   destination_longitude: destinationLongitude,
                   ride_time: rideTime.toFixed(0),
-                  fare_price: parseInt(amount) * 100,
+                  bid_price: parseInt(amount) * 100,
                   payment_status: "paid",
                   driver_id: driverId,
                   user_id: userId,

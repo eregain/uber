@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       destination_latitude,
       destination_longitude,
       ride_time,
-      bid_price,
+      fare_price,
       payment_status,
       driver_id,
       user_id,
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       !destination_latitude ||
       !destination_longitude ||
       !ride_time ||
-      !bid_price ||
+      !fare_price ||
       !payment_status ||
       !driver_id ||
       !user_id
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
           ${destination_latitude},
           ${destination_longitude},
           ${ride_time},
-          ${bid_price},
+          ${fare_price},
           ${payment_status},
           ${driver_id},
           ${user_id}

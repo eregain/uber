@@ -1,6 +1,5 @@
 import { useUser } from "@clerk/clerk-expo";
 import { useAuth } from "@clerk/clerk-expo";
-import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
 import {
@@ -12,20 +11,21 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Location from "expo-location";
 
 import GoogleTextInput from "../../../components/GoogleTextInput";
 import Map from "../../../components/Map";
 import RideCard from "../../../components/RideCard";
 import { icons, images } from "../../../constants";
-import { mockDrivers } from "../../../constants/mockData";
 import { useFetch } from "../../../lib/fetch";
 import { useLocationStore } from "../../../store";
 import { Ride } from "../../../types/type";
+import { mockDrivers } from "../../../constants/mockDrivers";
 
 const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
-  const [hasPermission, setHasPermission] = useState(true);
+  const [hasPermission, setHasPermission] = useState(false);
   const [loadingLocation, setLoadingLocation] = useState(true);
   const [rides, setRides] = useState<Ride[]>([]);
   const [destination, setDestination] = useState("");
@@ -106,7 +106,7 @@ const Home = () => {
             />
             <View className="ml-3">
               <Text className="font-bold">{`${item.first_name} ${item.last_name}`}</Text>
-              <Text>{`Rating: ${item.rating}, Seats: ${item.car_seats}, Bid Price: ${item.bid_price}`}</Text>
+              <Text>{`Rating: ${item.rating}, Seats: ${item.car_seats}`}</Text>
             </View>
           </View>
         )}

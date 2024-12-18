@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 import { DriverStore, LocationStore, MarkerData } from "@/types/type";
 
+// Location Store
 export const useLocationStore = create<LocationStore>((set) => ({
   userLatitude: null,
   userLongitude: null,
@@ -9,6 +10,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
   destinationLatitude: null,
   destinationLongitude: null,
   destinationAddress: null,
+
   setUserLocation: ({
     latitude,
     longitude,
@@ -24,9 +26,8 @@ export const useLocationStore = create<LocationStore>((set) => ({
       userAddress: address,
     }));
 
-    // If driver is selected and now a new location is set, clear the selected driver
-    const { selectedDriver, clearSelectedDriver } = useDriverStore.getState();
-    if (selectedDriver) clearSelectedDriver();
+    // Clear the selected driver if a new user location is set
+    useDriverStore.getState().clearSelectedDriver();
   },
 
   setDestinationLocation: ({
@@ -44,17 +45,28 @@ export const useLocationStore = create<LocationStore>((set) => ({
       destinationAddress: address,
     }));
 
-    // If driver is selected and now a new location is set, clear the selected driver
-    const { selectedDriver, clearSelectedDriver } = useDriverStore.getState();
-    if (selectedDriver) clearSelectedDriver();
+    // Clear the selected driver if a new destination is set
+    useDriverStore.getState().clearSelectedDriver();
   },
 }));
 
+// Driver Store
 export const useDriverStore = create<DriverStore>((set) => ({
-  drivers: [] as MarkerData[],
-  selectedDriver: null,
+  drivers: [], // List of drivers with marker data
+  selectedDriver: null, // Selected driver ID
+
   setSelectedDriver: (driverId: number) =>
-    set(() => ({ selectedDriver: driverId })),
-  setDrivers: (drivers: MarkerData[]) => set(() => ({ drivers })),
-  clearSelectedDriver: () => set(() => ({ selectedDriver: null })),
+    set(() => ({
+      selectedDriver: driverId,
+    })),
+
+  setDrivers: (drivers: MarkerData[]) =>
+    set(() => ({
+      drivers,
+    })),
+
+  clearSelectedDriver: () =>
+    set(() => ({
+      selectedDriver: null,
+    })),
 }));

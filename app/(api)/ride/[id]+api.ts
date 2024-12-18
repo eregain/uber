@@ -26,8 +26,7 @@ export async function GET(request: Request, { id }: { id: string }) {
                 'profile_image_url', drivers.profile_image_url,
                 'car_image_url', drivers.car_image_url,
                 'car_seats', drivers.car_seats,
-                'rating', drivers.rating,
-                'bid_price', drivers.bid_price,
+                'rating', drivers.rating
             ) AS driver 
         FROM 
             rides

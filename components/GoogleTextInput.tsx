@@ -1,17 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
-import { View, TextInput, TouchableOpacity, Image, Alert } from "react-native";
+import React, { useState } from 'react';
+import { View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { useLocationStore } from '../store';
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
-import { useLocationStore } from "../store";
+import { icons } from "@/constants";
+import { GoogleInputProps } from "@/types/type";
+
+const googlePlacesApiKey = process.env.EXPO_PUBLIC_PLACES_API_KEY;
+
 
 interface GoogleTextInputProps {
   icon: any;
   containerStyle?: string;
-  handlePress: (location: {
-    latitude: number;
-    longitude: number;
-    address: string;
-  }) => void;
+  handlePress: (location: { latitude: number; longitude: number; address: string }) => void;
 }
 
 const GoogleTextInput: React.FC<GoogleTextInputProps> = ({
@@ -19,21 +20,12 @@ const GoogleTextInput: React.FC<GoogleTextInputProps> = ({
   containerStyle,
   handlePress,
 }) => {
-  const [searchText, setSearchText] = useState("");
+  const [searchText, setSearchText] = useState('');
+  const { setDestinationLocation } = useLocationStore();
 
   const handleSearch = async () => {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}`,
-        {
-          headers: {
-            "User-Agent": "YourAppName/1.0",
-          },
-        },
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchText)}`);
       const data = await response.json();
       if (data && data.length > 0) {
         const location = {
@@ -41,16 +33,11 @@ const GoogleTextInput: React.FC<GoogleTextInputProps> = ({
           longitude: parseFloat(data[0].lon),
           address: data[0].display_name,
         };
+        setDestinationLocation(location);
         handlePress(location);
-      } else {
-        Alert.alert("No results found", "Please try a different search term.");
       }
     } catch (error) {
-      console.error("Error searching for location:", error);
-      Alert.alert(
-        "Error",
-        "Failed to search for location. Please check your internet connection and try again.",
-      );
+      console.error('Error searching for location:', error);
     }
   };
 
@@ -58,7 +45,7 @@ const GoogleTextInput: React.FC<GoogleTextInputProps> = ({
     <View className={`flex-row items-center ${containerStyle}`}>
       <TextInput
         placeholder="Where to?"
-        className="flex-1 h-12 px-4"
+        className="flex-1 h-16 px-8 "
         value={searchText}
         onChangeText={setSearchText}
         onSubmitEditing={handleSearch}
@@ -71,3 +58,4 @@ const GoogleTextInput: React.FC<GoogleTextInputProps> = ({
 };
 
 export default GoogleTextInput;
+
