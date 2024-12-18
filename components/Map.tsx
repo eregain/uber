@@ -13,7 +13,6 @@ import {
 import { useDriverStore, useLocationStore } from "@/store";
 import { Driver, MarkerData } from "@/types/type";
 
-
 const directionsAPI = process.env.EXPO_PUBLIC_DIRECTIONS_API_KEY;
 
 const Map = () => {
@@ -22,11 +21,11 @@ const Map = () => {
     userLatitude,
     destinationLatitude,
     destinationLongitude,
-    driverLatitude, 
+    driverLatitude,
     driverLongitude,
   } = useLocationStore();
   const { selectedDriver, setDrivers } = useDriverStore();
-  
+
   const { data: drivers, loading, error } = useFetch<Driver[]>("/(api)/driver");
   const [markers, setMarkers] = useState<MarkerData[]>([]);
 
@@ -38,7 +37,7 @@ const Map = () => {
         data: drivers,
         userLatitude,
         userLongitude,
-        driverLatitude, 
+        driverLatitude,
         driverLongitude,
       });
 
@@ -135,10 +134,9 @@ const Map = () => {
             strokeWidth={2}
           />
         </>
-      )} 
+      )}
 
-      
-{driverLatitude && driverLongitude && (
+      {driverLatitude && driverLongitude && (
         <>
           <Marker
             key={`${driver_id}`}
@@ -163,7 +161,7 @@ const Map = () => {
             strokeWidth={2}
           />
         </>
-            )} 
+      )}
     </MapView>
   );
 };

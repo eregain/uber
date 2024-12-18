@@ -9,7 +9,7 @@ export const mockDrivers = [
       "https://ucarecdn.com/a2dc52b2-8bf7-4e49-9a36-3ffb5229ed02/-/preview/465x466/",
     car_seats: 4,
     rating: 4.8,
-    bid_price: 2000.2
+    bid_price: 2000.2,
   },
   {
     id: 2,
