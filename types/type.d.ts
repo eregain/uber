@@ -104,6 +104,7 @@ declare interface LocationStore {
   destinationLatitude: number | null;
   destinationLongitude: number | null;
   destinationAddress: string | null;
+  vehicleType: "car" | "tricycle" | null;
   setUserLocation: ({
     latitude,
     longitude,
@@ -122,6 +123,7 @@ declare interface LocationStore {
     longitude: number;
     address: string;
   }) => void;
+  setVehicleType: (type: "car" | "tricycle") => void;
 }
 
 declare interface DriverStore {

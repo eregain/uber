@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
-import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
+import React, { useEffect, useState, useRef } from "react";
+import { ActivityIndicator, Text, View, StyleSheet } from "react-native";
+import MapView, { Marker, PROVIDER_DEFAULT, Polyline } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 
 import { icons } from "@/constants";
@@ -21,35 +21,34 @@ const Map = () => {
     userLatitude,
     destinationLatitude,
     destinationLongitude,
-    driverLatitude,
-    driverLongitude,
+    userAddress,
+    destinationAddress,
   } = useLocationStore();
   const { selectedDriver, setDrivers } = useDriverStore();
 
   const { data: drivers, loading, error } = useFetch<Driver[]>("/(api)/driver");
   const [markers, setMarkers] = useState<MarkerData[]>([]);
+  const [distance, setDistance] = useState<string>("");
+  const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
-    if (Array.isArray(drivers)) {
-      if (!userLatitude || !userLongitude) return;
-
+    if (Array.isArray(drivers) && userLatitude && userLongitude) {
       const newMarkers = generateMarkersFromData({
         data: drivers,
         userLatitude,
         userLongitude,
-        driverLatitude,
-        driverLongitude,
       });
-
       setMarkers(newMarkers);
     }
-  }, [drivers, userLatitude, userLongitude, driverLatitude, driverLongitude]);
+  }, [drivers, userLatitude, userLongitude]);
 
   useEffect(() => {
     if (
       markers.length > 0 &&
-      destinationLatitude !== undefined &&
-      destinationLongitude !== undefined
+      userLatitude &&
+      userLongitude &&
+      destinationLatitude &&
+      destinationLongitude
     ) {
       calculateDriverTimes({
         markers,
@@ -57,11 +56,38 @@ const Map = () => {
         userLongitude,
         destinationLatitude,
         destinationLongitude,
-      }).then((drivers) => {
-        setDrivers(drivers as MarkerData[]);
+      }).then((updatedDrivers) => {
+        setDrivers(updatedDrivers as MarkerData[]);
       });
     }
-  }, [markers, destinationLatitude, destinationLongitude]);
+  }, [
+    markers,
+    destinationLatitude,
+    destinationLongitude,
+    userLatitude,
+    userLongitude,
+    setDrivers,
+  ]);
+
+  useEffect(() => {
+    if (
+      userLatitude &&
+      userLongitude &&
+      destinationLatitude &&
+      destinationLongitude
+    ) {
+      mapRef.current?.fitToCoordinates(
+        [
+          { latitude: userLatitude, longitude: userLongitude },
+          { latitude: destinationLatitude, longitude: destinationLongitude },
+        ],
+        {
+          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+          animated: true,
+        },
+      );
+    }
+  }, [userLatitude, userLongitude, destinationLatitude, destinationLongitude]);
 
   const region = calculateRegion({
     userLatitude,
@@ -70,100 +96,155 @@ const Map = () => {
     destinationLongitude,
   });
 
-  if (loading || (!userLatitude && !userLongitude))
+  if (loading || !userLatitude || !userLongitude) {
     return (
-      <View className="flex justify-between items-center w-full">
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="small" color="#000" />
       </View>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
-      <View className="flex justify-between items-center w-full">
-        <Text>Error: {error}</Text>
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>
+          Error: {error instanceof Error ? error.message : String(error)}
+        </Text>
       </View>
     );
+  }
 
   return (
-    <MapView
-      provider={PROVIDER_DEFAULT}
-      className="w-full h-full rounded-2xl"
-      tintColor="black"
-      mapType="mutedStandard"
-      showsPointsOfInterest={false}
-      initialRegion={region}
-      showsUserLocation={true}
-      userInterfaceStyle="light"
-    >
-      {markers.map((marker, index) => (
+    <View style={styles.container}>
+      <MapView
+        ref={mapRef}
+        provider={PROVIDER_DEFAULT}
+        style={styles.map}
+        initialRegion={region}
+        showsUserLocation={true}
+        showsMyLocationButton={true}
+        showsCompass={true}
+        showsScale={true}
+        tintColor="black"
+        mapType="mutedStandard"
+        showsPointsOfInterest={false}
+        userInterfaceStyle="light"
+      >
+        {markers.map((marker) => (
+          <Marker
+            key={marker.id}
+            coordinate={{
+              latitude: marker.latitude,
+              longitude: marker.longitude,
+            }}
+            title={marker.title}
+            image={
+              selectedDriver === parseInt(marker.id)
+                ? icons.selectedMarker
+                : icons.marker
+            }
+          />
+        ))}
+
         <Marker
-          key={marker.id}
           coordinate={{
-            latitude: marker.latitude,
-            longitude: marker.longitude,
+            latitude: userLatitude,
+            longitude: userLongitude,
           }}
-          title={marker.title}
-          image={
-            selectedDriver === +marker.id ? icons.selectedMarker : icons.marker
-          }
+          title="Your Location"
+          description={userAddress || "Current Location"}
+          pinColor="#0286FF"
         />
-      ))}
 
-      {destinationLatitude && destinationLongitude && (
-        <>
-          <Marker
-            key="destination"
-            coordinate={{
-              latitude: destinationLatitude,
-              longitude: destinationLongitude,
-            }}
-            title="Destination"
-            image={icons.pin}
-          />
-          <MapViewDirections
-            origin={{
-              latitude: userLatitude!,
-              longitude: userLongitude!,
-            }}
-            destination={{
-              latitude: destinationLatitude,
-              longitude: destinationLongitude,
-            }}
-            apikey={directionsAPI!}
-            strokeColor="#0286FF"
-            strokeWidth={2}
-          />
-        </>
+        {destinationLatitude && destinationLongitude && (
+          <>
+            <Marker
+              coordinate={{
+                latitude: destinationLatitude,
+                longitude: destinationLongitude,
+              }}
+              title="Destination"
+              description={destinationAddress || "Destination"}
+              image={icons.pin}
+            />
+            <Polyline
+              coordinates={[
+                { latitude: userLatitude, longitude: userLongitude },
+                {
+                  latitude: destinationLatitude,
+                  longitude: destinationLongitude,
+                },
+              ]}
+              strokeColor="#0286FF"
+              strokeWidth={3}
+            />
+            <MapViewDirections
+              origin={{
+                latitude: userLatitude,
+                longitude: userLongitude,
+              }}
+              destination={{
+                latitude: destinationLatitude,
+                longitude: destinationLongitude,
+              }}
+              apikey={directionsAPI || ""}
+              strokeColor="#0286FF"
+              strokeWidth={2}
+              mode="DRIVING"
+              precision="high"
+              timePrecision="now"
+              onReady={(result) => {
+                setDistance(`${result.distance.toFixed(2)} km`);
+              }}
+            />
+          </>
+        )}
+      </MapView>
+      {distance && (
+        <View style={styles.distanceContainer}>
+          <Text style={styles.distanceText}>Distance: {distance}</Text>
+        </View>
       )}
-
-      {driverLatitude && driverLongitude && (
-        <>
-          <Marker
-            key={`${driver_id}`}
-            coordinate={{
-              latitude: destinationLatitude,
-              longitude: destinationLongitude,
-            }}
-            title={key}
-            image={icons.marker}
-          />
-          <MapViewDirections
-            origin={{
-              latitude: driverLatitude!,
-              longitude: driverLongitude!,
-            }}
-            driver={{
-              latitude: driverLatitude,
-              longitude: driverLongitude,
-            }}
-            apikey={directionsAPI!}
-            strokeColor="#0286FF"
-            strokeWidth={2}
-          />
-        </>
-      )}
-    </MapView>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+  },
+  distanceContainer: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    right: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    padding: 8,
+    borderRadius: 8,
+  },
+  distanceText: {
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+});
 
 export default Map;

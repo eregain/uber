@@ -10,6 +10,9 @@ export const useLocationStore = create<LocationStore>((set) => ({
   destinationLatitude: null,
   destinationLongitude: null,
   destinationAddress: null,
+  vehicleType: null,
+  driverLatitude: null,
+  driverLongitude: null,
 
   setUserLocation: ({
     latitude,
@@ -48,6 +51,8 @@ export const useLocationStore = create<LocationStore>((set) => ({
     // Clear the selected driver if a new destination is set
     useDriverStore.getState().clearSelectedDriver();
   },
+
+  setVehicleType: (type: "car" | "tricycle") => set({ vehicleType: type }),
 }));
 
 // Driver Store

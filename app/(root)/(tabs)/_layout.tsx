@@ -36,7 +36,7 @@ export default function Layout() {
         tabBarStyle: {
           backgroundColor: "#333333",
           borderRadius: 50,
-          paddingBottom: 0, // ios only
+          paddingBottom: 0,
           overflow: "hidden",
           marginHorizontal: 20,
           marginBottom: 20,
@@ -46,6 +46,10 @@ export default function Layout() {
           alignItems: "center",
           flexDirection: "row",
           position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
         },
       }}
     >

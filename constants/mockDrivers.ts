@@ -1,4 +1,4 @@
-export const mockDrivers = [
+export const mockCarDrivers = [
   {
     id: 1,
     first_name: "James",
@@ -23,6 +23,9 @@ export const mockDrivers = [
     rating: 4.6,
     bid_price: 3500.34,
   },
+];
+
+export const mockTricycleDrivers = [
   {
     id: 3,
     first_name: "Michael",
